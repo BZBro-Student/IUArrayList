@@ -196,14 +196,14 @@ public class ListTester {
 		testSingleElementList(AB_remove0_B, "AB_remove0_B", LIST_B, STRING_A);
 		testSingleElementList(AB_remove1_A, "AB_remove1_A", LIST_A, STRING_A);
 		//2-element to 3-element
-		// testThreeElementList(AB_addToFrontC_CAB, "AB_addToFrontC_CAB", LIST_CAB, STRING_CAB);
-		// testThreeElementList(AB_addToRear_ABC, "AB_addToRear_ABC", LIST_ABC, STRING_ABC);
+		testThreeElementList(AB_addToFrontC_CAB, "AB_addToFrontC_CAB", LIST_CAB, STRING_CAB);
+		testThreeElementList(AB_addToRear_ABC, "AB_addToRear_ABC", LIST_ABC, STRING_ABC);
 		// testThreeElementList(AB_addAfterCA_ACB, "AB_addAfterCA_ACB", LIST_ACB, STRING_ACB);
-		// testThreeElementList(AB_addAfterCB_ABC, "AB_addAfterCB_ABC", LIST_ABC, STRING_ABC);
-		// testThreeElementList(AB_addC_ABC, "AB_addC_ABC", LIST_ABC, STRING_ABC);
-		// testThreeElementList(AB_add0C_CAB, "AB_add0C_CAB", LIST_CAB, STRING_CAB);
+		testThreeElementList(AB_addAfterCB_ABC, "AB_addAfterCB_ABC", LIST_ABC, STRING_ABC);
+		testThreeElementList(AB_addC_ABC, "AB_addC_ABC", LIST_ABC, STRING_ABC);
+		testThreeElementList(AB_add0C_CAB, "AB_add0C_CAB", LIST_CAB, STRING_CAB);
 		// testThreeElementList(AB_add1C_ACB, "AB_add1C_ACB", LIST_ACB, STRING_ACB);
-		// testThreeElementList(AB_add2C_ABC,"AB_add2C_ABC", LIST_ABC, STRING_ABC);
+		testThreeElementList(AB_add2C_ABC,"AB_add2C_ABC", LIST_ABC, STRING_ABC);
 		//testThreeElementList
 		//2-element to changed 2-element via set()
 		// testTwoElementList(AB_set0C_CB, "AB_set0C_CB", LIST_CB, STRING_CB);
@@ -456,6 +456,72 @@ public class ListTester {
 		return list;
 	}
 	private Scenario<Integer> A_add1B_AB = () -> A_add1B_AB();
+
+	// Tests for scenarios ending in [CAB]
+
+	/**
+	 * Scenario: [AB] -> addToFrontC -> [C,A,B]
+	 * @return [C,A,B] after addToFront(C)
+	 */
+	private IndexedUnsortedList<Integer> AB_addToFrontC_CAB() {
+		IndexedUnsortedList<Integer> list = A_addAfterBA_AB(); 
+		list.addToFront(ELEMENT_C);
+		return list;
+	}
+	private Scenario<Integer> AB_addToFrontC_CAB = () -> AB_addToFrontC_CAB();
+
+	/**
+	 * Scenario: [AB] -> add(0,C) -> [C,A,B]
+	 * @return [C,A,B] after add(0,C)
+	 */
+	private IndexedUnsortedList<Integer> AB_add0C_CAB() {
+		IndexedUnsortedList<Integer> list = A_addAfterBA_AB(); 
+		list.add(0,ELEMENT_C);
+		return list;
+	}
+	private Scenario<Integer> AB_add0C_CAB = () -> AB_add0C_CAB();
+
+	//Test for scenarios ending in [A,B,C]
+
+	/**
+	 * Scenario: [AB] -> addToRearC -> [A,B,C]
+	 * @return [C,A,B] after addToRear(C)
+	 */
+	private IndexedUnsortedList<Integer> AB_addToRear_ABC() {
+		IndexedUnsortedList<Integer> list = A_addAfterBA_AB(); 
+		list.addToRear(ELEMENT_C);
+		return list;
+	}
+	private Scenario<Integer> AB_addToRear_ABC = () -> AB_addToRear_ABC();
+
+	/**
+	 * Scenario: [AB] -> addAfterCB -> ABC
+	 * @return [A,B,C] after addAfter(C,B)
+	 */
+	private IndexedUnsortedList<Integer> AB_addAfterCB_ABC() {
+		IndexedUnsortedList<Integer> list = A_addAfterBA_AB(); 
+		list.addAfter(ELEMENT_C, ELEMENT_B);
+		return list;
+	}
+	private Scenario<Integer> AB_addAfterCB_ABC = () -> AB_addAfterCB_ABC();
+
+	/**
+	 * Scenario: [AB] -> add[C] -> ABC
+	 * @return
+	 */
+	private IndexedUnsortedList<Integer> AB_addC_ABC() {
+		IndexedUnsortedList<Integer> list = A_addAfterBA_AB(); 
+		list.add(ELEMENT_C);
+		return list;
+	}
+	private Scenario<Integer> AB_addC_ABC = () -> AB_addC_ABC();
+
+	private IndexedUnsortedList<Integer> AB_add2C_ABC() {
+		IndexedUnsortedList<Integer> list = A_addAfterBA_AB(); 
+		list.addToRear(ELEMENT_C);
+		return list;
+	}
+	private Scenario<Integer> AB_add2C_ABC = () -> AB_add2C_ABC();
 	
 	//Tests for scenarios ending in []
 
@@ -755,7 +821,7 @@ public class ListTester {
 			printTest(scenarioName + "_testGet0", testGet(scenario.build(), 0, contents[0], Result.MatchingValue));
 			printTest(scenarioName + "_testGet1", testGet(scenario.build(), 1, contents[1], Result.MatchingValue));
 			printTest(scenarioName + "_testGet2", testGet(scenario.build(), 2, contents[2], Result.MatchingValue));
-			printTest(scenarioName + "_testGet0", testGet(scenario.build(), 3, contents[3], Result.IndexOutOfBounds));
+			printTest(scenarioName + "_testGet0", testGet(scenario.build(), 3, null, Result.IndexOutOfBounds));
 			printTest(scenarioName + "_testIndexOf" + contentsString.charAt(0), testIndexOf(scenario.build(), contents[0], 0));
 			printTest(scenarioName + "_testIndexOf" + contentsString.charAt(1), testIndexOf(scenario.build(), contents[1], 1));
 			printTest(scenarioName + "_testIndexOf" + contentsString.charAt(2), testIndexOf(scenario.build(), contents[2], 2));
@@ -764,7 +830,7 @@ public class ListTester {
 			printTest(scenarioName + "_testRemove0", testRemoveIndex(scenario.build(), 0, contents[0], Result.MatchingValue));
 			printTest(scenarioName + "_testRemove1", testRemoveIndex(scenario.build(), 1, contents[1], Result.MatchingValue));
 			printTest(scenarioName + "_testRemove2", testRemoveIndex(scenario.build(), 2, contents[2], Result.MatchingValue));
-			printTest(scenarioName + "_testRemove0", testRemoveIndex(scenario.build(), 3, contents[3], Result.IndexOutOfBounds));
+			printTest(scenarioName + "_testRemove0", testRemoveIndex(scenario.build(), 3, null, Result.IndexOutOfBounds));
 			// Iterator
 			printTest(scenarioName + "_testIter", testIter(scenario.build(), Result.NoException));
 			printTest(scenarioName + "_testIterHasNext", testIterHasNext(scenario.build().iterator(), Result.True));
