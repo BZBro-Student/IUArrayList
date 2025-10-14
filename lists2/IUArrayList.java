@@ -74,32 +74,31 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public void addAfter(T element, T target) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addAfter'");
+        shiftElementForwardFrom(indexOf(target)+1);
+        array[indexOf(target)+1] = element;
+        rear++;
     }
 
     @Override
     public void add(int index, T element) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'add'");
+        shiftElementForwardFrom(index);
+        array[index] = element;
+        rear++;
     }
 
     @Override
     public T removeFirst() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeFirst'");
+        return remove(0);
     }
 
     @Override
     public T removeLast() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeLast'");
+        return remove(rear-1);
     }
 
     @Override
     public T remove(T element) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'remove'");
+        return remove(indexOf(element));
     }
 
     @Override
@@ -116,8 +115,7 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public void set(int index, T element) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'set'");
+        array[index] = element;
     }
 
     @Override
