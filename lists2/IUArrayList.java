@@ -11,66 +11,6 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
     public static final int DEFAULT_SIZE = 10;
     private int modCount;
 
-    private class IUArrayListIterator implements Iterator<T> {
-
-        private int currIndex;
-        private int lastReturnedIndex;
-        private int callsToNext;
-        private int callsToRemoveBeforeNext;
-        private int expectedModCount;
-
-        private IUArrayListIterator() {
-            currIndex = -1;
-            callsToNext = 0;
-            callsToRemoveBeforeNext = 0;
-            expectedModCount = IUArrayList.this.modCount;
-        }
-
-        private void hasChanged() {
-            if (expectedModCount != IUArrayList.this.modCount) {
-                throw new ConcurrentModificationException();
-            }
-        }
-
-        @Override
-        public boolean hasNext() {
-            hasChanged();
-            boolean hasNext = false;
-            if (currIndex + 1 < rear) {
-                hasNext = true;
-            }
-            return hasNext;
-        }
-
-        @Override
-        public T next() {
-            hasChanged();
-            if (hasNext()) {
-                currIndex++;
-                callsToNext++;
-                lastReturnedIndex = currIndex;
-                callsToRemoveBeforeNext = 0;
-                return array[currIndex];
-            } else {
-                throw new NoSuchElementException();
-            }
-        }
-
-        @Override
-        public void remove() {
-            hasChanged();
-            if (callsToNext == 0 || callsToRemoveBeforeNext >= 1) {
-                throw new IllegalStateException();
-            } else {
-                IUArrayList.this.remove(lastReturnedIndex);
-                expectedModCount++;
-                currIndex--;
-                callsToRemoveBeforeNext++;
-                callsToNext = 0;
-            }
-        }
-    }
-
     /**
      * Initialize list with default size
      */
@@ -146,12 +86,11 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
     @Override
     public void addAfter(T element, T target) {
         expandCheck();
-        int targetIndex = indexOf(target);
-        if (targetIndex < 0 || targetIndex > rear){
-        throw new IndexOutOfBoundsException();
+        if (indexOf(target) == -1) {
+            throw new NoSuchElementException();
         }
-        shiftElementForwardFrom(targetIndex + 1);
-        array[targetIndex + 1] = element;
+        shiftElementForwardFrom(indexOf(target));
+        array[indexOf(target) + 1] = element;
         rear++;
         modCount++;
     }
@@ -159,6 +98,9 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
     @Override
     public void add(int index, T element) {
         expandCheck();
+        if (index < 0 || index > rear) {
+            throw new IndexOutOfBoundsException();
+        }
         shiftElementForwardFrom(index);
         array[index] = element;
         rear++;
@@ -167,16 +109,25 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public T removeFirst() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         return remove(0);
     }
 
     @Override
     public T removeLast() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
         return remove(rear - 1);
     }
 
     @Override
     public T remove(T element) {
+        if (indexOf(element) == -1) {
+            throw new NoSuchElementException();
+        }
         return remove(indexOf(element));
     }
 
@@ -195,6 +146,9 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public void set(int index, T element) {
+        if (index < 0 || index >= rear) {
+            throw new IndexOutOfBoundsException();
+        }
         array[index] = element;
         modCount++;
     }
@@ -262,6 +216,70 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
         }
         arrayStringBuilder.append("]");
         return arrayStringBuilder.toString();
+    }
+
+    private class IUArrayListIterator implements Iterator<T> {
+
+        private int currIndex;
+        private int lastReturnedIndex;
+        private int callsToNext;
+        private int callsToRemoveBeforeNext;
+        private int expectedModCount;
+
+        private IUArrayListIterator() {
+            currIndex = -1;
+            callsToNext = 0;
+            callsToRemoveBeforeNext = 0;
+            expectedModCount = IUArrayList.this.modCount;
+        }
+
+        /**
+         * Checks to see if the array has changed using outside methods
+         * to help enforce fail fast behavior
+         */
+        private void hasChanged() {
+            if (expectedModCount != IUArrayList.this.modCount) {
+                throw new ConcurrentModificationException();
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            hasChanged();
+            boolean hasNext = false;
+            if (currIndex + 1 < rear) {
+                hasNext = true;
+            }
+            return hasNext;
+        }
+
+        @Override
+        public T next() {
+            hasChanged();
+            if (hasNext()) {
+                currIndex++;
+                callsToNext++;
+                lastReturnedIndex = currIndex;
+                callsToRemoveBeforeNext = 0;
+                return array[currIndex];
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        @Override
+        public void remove() {
+            hasChanged();
+            if (callsToNext == 0 || callsToRemoveBeforeNext >= 1) {
+                throw new IllegalStateException();
+            } else {
+                IUArrayList.this.remove(lastReturnedIndex);
+                expectedModCount++;
+                currIndex--;
+                callsToRemoveBeforeNext++;
+                callsToNext = 0;
+            }
+        }
     }
 
     @Override
