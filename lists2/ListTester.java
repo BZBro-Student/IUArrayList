@@ -31,7 +31,7 @@ public class ListTester {
 		MatchingValue,
 		ValidString
 	};
-
+	
 	// named elements for use in tests
 	private static final Integer ELEMENT_A = 1;
 	private static final Integer ELEMENT_B = 2;
