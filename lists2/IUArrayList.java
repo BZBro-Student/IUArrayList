@@ -27,6 +27,7 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
     public IUArrayList(int size) {
         array = (T[]) (new Object[size]);
         rear = 0;
+        modCount = 0;
     }
 
     /**
@@ -86,11 +87,12 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
     @Override
     public void addAfter(T element, T target) {
         expandCheck();
-        if (indexOf(target) == -1) {
+        int targetIndex = indexOf(target);
+        if (targetIndex == -1) {
             throw new NoSuchElementException();
         }
-        shiftElementForwardFrom(indexOf(target));
-        array[indexOf(target) + 1] = element;
+        shiftElementForwardFrom(targetIndex + 1);
+        array[targetIndex + 1] = element;
         rear++;
         modCount++;
     }
