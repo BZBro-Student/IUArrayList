@@ -228,7 +228,6 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
 
         private int currLocation;
         private int lastReturnedIndex;
-        private int callsToNext;
         private int callsToRemove;
         private int expectedModCount;
 
@@ -239,8 +238,7 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
              * if at 0 it is between 0 and 1, and so on
              */
             currLocation = -1;
-            callsToNext = 0;
-            callsToRemove = 0;
+            callsToRemove = 1;
             expectedModCount = modCount;
         }
 
@@ -265,7 +263,6 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
             hasChanged();
             if (hasNext()) {
                 currLocation++;
-                callsToNext++;
                 lastReturnedIndex = currLocation;
                 callsToRemove = 0;
                 return array[currLocation];
@@ -277,14 +274,13 @@ public class IUArrayList<T> implements IndexedUnsortedList<T> {
         @Override
         public void remove() {
             hasChanged();
-            if (callsToNext == 0 || callsToRemove >= 1) {
+            if (callsToRemove >= 1) {
                 throw new IllegalStateException();
             } else {
                 IUArrayList.this.remove(lastReturnedIndex);
                 expectedModCount++;
                 currLocation--;
                 callsToRemove++;
-                callsToNext = 0;
             }
         }
     }
